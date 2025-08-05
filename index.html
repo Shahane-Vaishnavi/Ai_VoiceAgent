@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gobi Voice Agent</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #3b0a20, #1a000d);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      overflow: hidden;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      padding: 40px;
+      width: 90%;
+      max-width: 560px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 0 40px rgba(245, 246, 246, 0.241);
+      text-align: center;
+      animation: slideIn 1s ease-out;
+    }
+
+    @keyframes slideIn {
+      0% {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      font-size: 2.3rem;
+      margin-bottom: 20px;
+      background: linear-gradient(to right,#ff4e8e, #ffb199);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 15px;
+      font-size: 1rem;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      resize: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 14px 32px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(to right,#ff416c, #ff4b2b);
+      color: #1a1a1a;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 12px rgba(255, 80, 120, 0.5);
+    }
+
+    button:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 20px rgba(255, 80, 120, 0.7);
+    }
+
+    .green-btn {
+      background: linear-gradient(to right, #28a745, #218838);
+      color: white;
+    }
+
+    .red-btn {
+      background: linear-gradient(to right, #dc3545, #c82333);
+      color: white;
+    }
+
+    audio {
+      margin-top: 30px;
+      width: 100%;
+      border-radius: 12px;
+    }
+
+    .footer {
+      margin-top: 25px;
+      font-size: 0.8rem;
+      color: #ccc;
+      font-style: italic;
+    }
+
+    @media (max-width: 500px) {
+      h1 {
+        font-size: 1.6rem;
+      }
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🧠 My Voice Agent</h1>
+    <textarea id="textInput" placeholder="Type something and watch the magic..."></textarea>
+    <button onclick="generateVoice()">🎙️ Speak Now</button>
+    <div id="audioSection"></div>
+    <div class="footer">Day 3 with Murf AI</div>
+
+    <!-- Echo Bot Section -->
+    <h1>🎧 Echo Bot</h1>
+    <button id="startBtn" class="green-btn">Start Recording</button>
+    <button id="stopBtn" class="red-btn" disabled>Stop Recording</button>
+    <audio id="echoAudio" controls></audio>
+
+    <div class="footer">Day 4 with Murf AI</div>
+  
+  </div>
+
+  <script>
+    async function generateVoice() {
+      const text = document.getElementById("textInput").value;
+      if (!text.trim()) {
+        alert("Please type something!");
+        return;
+      }
+
+      const response = await fetch("/generate-voice/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+
+      const data = await response.json();
+
+      if (data.audio_url) {
+        document.getElementById("audioSection").innerHTML =
+          `<audio controls autoplay src="${data.audio_url}"></audio>`;
+      } else {
+        alert("Voice generation failed.");
+      }
+    }
+    // Echo Bot Logic
+    let mediaRecorder;
+    let audioChunks = [];
+
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const echoAudio = document.getElementById("echoAudio");
+
+    startBtn.onclick = async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+
+      mediaRecorder.ondataavailable = (e) => {
+        audioChunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        const audioURL = URL.createObjectURL(blob);
+        echoAudio.src = audioURL;
+        audioChunks = [];
+      };
+
+      mediaRecorder.start();
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+    };
+
+    stopBtn.onclick = () => {
+      mediaRecorder.stop();
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+    };
+  </script>
+</body>
+</html>
