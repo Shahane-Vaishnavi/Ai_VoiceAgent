@@ -1,5 +1,5 @@
-from fastapi import FastAPI, Request,UploadFile, File
-from fastapi.responses import FileResponse, HTMLResponse,JSONResponse
+from fastapi import FastAPI, Request, UploadFile, File
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from pathlib import Path
@@ -9,8 +9,9 @@ import os
 
 app = FastAPI()
 
-# Create static folder if not exists
+# Create static and upload folder if not exists
 os.makedirs("static", exist_ok=True)
+os.makedirs("uploads", exist_ok=True)
 
 # Input model
 class TextInput(BaseModel):
@@ -45,16 +46,23 @@ async def generate_voice(data: TextInput):
     return {"audio_url": f"/static/{filename}"}
 
 # New: Upload endpoint for Echo Bot
-@app.post("/upload-audio/")
+@app.post("/upload")
 async def upload_audio(file: UploadFile = File(...)):
-    upload_path = Path("uploads") / file.filename
-    with open(upload_path, "wb") as f:
-        content = await file.read()
-        f.write(content)
-    file_size = upload_path.stat().st_size
+    try:
+        ext = file.filename.split('.')[-1]
+        filename = f"{uuid.uuid4()}.{ext}"
+        filepath = os.path.join("uploads", filename)
 
-    return JSONResponse(content={
-        "filename": file.filename,
-        "content_type": file.content_type,
-        "file_size": f"{file_size} bytes"
-    })
+        contents = await file.read()
+        with open(filepath, "wb") as f:
+            f.write(contents)
+
+        return {
+            "filename": filename,
+            "content_type": file.content_type,
+            "size": len(contents),
+            "url": f"/uploads/{filename}"   # ✅ fixed this line
+        }
+
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
