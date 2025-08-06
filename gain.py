@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi import FastAPI, Request,UploadFile, File
+from fastapi.responses import FileResponse, HTMLResponse,JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from pathlib import Path
 from gtts import gTTS
 import uuid
 import os
@@ -42,3 +43,18 @@ async def generate_voice(data: TextInput):
     tts.save(path)
 
     return {"audio_url": f"/static/{filename}"}
+
+# New: Upload endpoint for Echo Bot
+@app.post("/upload-audio/")
+async def upload_audio(file: UploadFile = File(...)):
+    upload_path = Path("uploads") / file.filename
+    with open(upload_path, "wb") as f:
+        content = await file.read()
+        f.write(content)
+    file_size = upload_path.stat().st_size
+
+    return JSONResponse(content={
+        "filename": file.filename,
+        "content_type": file.content_type,
+        "file_size": f"{file_size} bytes"
+    })

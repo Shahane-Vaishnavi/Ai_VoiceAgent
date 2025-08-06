@@ -19,7 +19,7 @@
       justify-content: center;
       align-items: center;
       color: white;
-      overflow: hidden;
+      overflow: auto;
     }
 
     .card {
@@ -79,6 +79,7 @@
       cursor: pointer;
       transition: all 0.3s ease;
       box-shadow: 0 0 12px rgba(255, 80, 120, 0.5);
+       margin: 10px;
     }
 
     button:hover {
@@ -109,6 +110,13 @@
       font-style: italic;
     }
 
+    .status {
+      margin-top: 20px;
+      font-size: 0.95rem;
+      color: #aaffaa;
+    }
+
+
     @media (max-width: 500px) {
       h1 {
         font-size: 1.6rem;
@@ -125,15 +133,19 @@
     <textarea id="textInput" placeholder="Type something and watch the magic..."></textarea>
     <button onclick="generateVoice()">🎙️ Speak Now</button>
     <div id="audioSection"></div>
-    <div class="footer">Day 3 with Murf AI</div>
 
     <!-- Echo Bot Section -->
-    <h1>🎧 Echo Bot</h1>
+    <!-- <h1>🎧 Echo Bot</h1>
     <button id="startBtn" class="green-btn">Start Recording</button>
     <button id="stopBtn" class="red-btn" disabled>Stop Recording</button>
-    <audio id="echoAudio" controls></audio>
+    <audio id="echoAudio" controls></audio> -->
+     <h1>🎤 Echo Bot</h1>
+    <button id="start-btn">Start Recording</button>
+    <button id="stop-btn" disabled>Stop Recording</button>
+    <audio id="playback" controls></audio>
+    <div id="status-msg" class="status"></div>
 
-    <div class="footer">Day 4 with Murf AI</div>
+    <div class="footer">Day 5 with Murf AI</div>
   
   </div>
 
@@ -166,7 +178,9 @@
 
     const startBtn = document.getElementById("startBtn");
     const stopBtn = document.getElementById("stopBtn");
-    const echoAudio = document.getElementById("echoAudio");
+    const playback = document.getElementById("playback");
+    const statusMsg = document.getElementById("status-msg");
+
 
     startBtn.onclick = async () => {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -176,11 +190,28 @@
         audioChunks.push(e.data);
       };
 
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(audioChunks, { type: "audio/webm" });
         const audioURL = URL.createObjectURL(blob);
-        echoAudio.src = audioURL;
+        playback.src = audioURL;
         audioChunks = [];
+
+      // Upload to FastAPI
+        const formData = new FormData();
+        formData.append("file", blob, "recording.webm");
+
+        statusMsg.innerText = "📤 Uploading...";
+
+        try {
+          const res = await fetch("/upload-audio/", {
+            method: "POST",
+            body: formData
+          });
+          const data = await res.json();
+          statusMsg.innerText = `✅ Uploaded: ${data.filename} (${data.file_size})`;
+        } catch (err) {
+          statusMsg.innerText = "❌ Upload failed.";
+        }
       };
 
       mediaRecorder.start();
