@@ -1,35 +1,282 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Voice Generator & Echo Bot</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Gobi Voice Agent</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    
+     * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #3b0a20, #1a000d);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      overflow: auto;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      padding: 40px;
+      width: 90%;
+      max-width: 560px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 0 40px rgba(245, 246, 246, 0.241);
+      text-align: center;
+      animation: slideIn 1s ease-out;
+    }
+
+    @keyframes slideIn {
+      0% {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      font-size: 2.3rem;
+      margin-bottom: 20px;
+      background: linear-gradient(to right,#ff4e8e, #ffb199);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 15px;
+      font-size: 1rem;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      resize: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 14px 32px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(to right,#ff416c, #ff4b2b);
+      color: #1a1a1a;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 12px rgba(255, 80, 120, 0.5);
+       margin: 10px;
+    }
+
+    button:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 20px rgba(255, 80, 120, 0.7);
+    }
+
+    .green-btn {
+      background: linear-gradient(to right, #28a745, #218838);
+      color: white;
+    }
+
+    .red-btn {
+      background: linear-gradient(to right, #dc3545, #c82333);
+      color: white;
+    }
+
+    #transcription {
+      margin-top: 15px;
+      border: 2px solid purple;
+      padding: 10px;
+      border-radius: 10px;
+      background: #f4eaff;
+      color: black;
+        }
+
+    audio {
+     /* width: 200px;
+      height: 30px;
+      margin: auto;
+      display: block;*/ 
+      margin-top: 30px;
+      width: 100%;
+      border-radius: 12px; 
+    }
+    
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 10px;
+    }
+
+    .footer {
+      margin-top: 25px;
+      font-size: 0.8rem;
+      color: #ccc;
+      font-style: italic;
+    }
+
+    .status {
+      margin-top: 20px;
+      font-size: 0.95rem;
+      color: #aaffaa;
+    }
+
+
+    @media (max-width: 500px) {
+      h1 {
+        font-size: 1.6rem;
+      }
+      button {
+        width: 100%;
+      }
+    } 
+  </style>
 </head>
 <body>
-  <div class="container">
-    <div class="card ai-generator">
-      <h2>🎤 AI Voice Generator</h2>
-      <p>Transform your text into natural-sounding speech</p>
-      <textarea placeholder="Type or paste your text here..." maxlength="5000"></textarea>
-      <select>
-        <option>Natalie (US Female)</option>
-        <option>Matthew (US Male)</option>
-      </select>
-      <button class="generate-btn">🎶 Generate Speech</button>
-    </div>
+  <body>
+  <div class="card">
+    <h1>🧠 My Voice Agent</h1>
 
-    <div class="card echo-bot">
-      <h2>🎧 Echo Bot</h2>
-      <p>Say something and I will repeat it</p>
-      <div class="buttons">
-        <button class="record">Start Recording</button>
-        <button class="stop">Stop Recording</button>
-      </div>
-      <div class="status">Recording... Speak into your microphone!</div>
-      <div class="upload-msg">Upload successful: <span>recording.webm</span></div>
-      <audio controls></audio>
-    </div>
+    <!-- Text Input for TTS -->
+    <textarea id="textInput" placeholder="Type something and watch the magic..."></textarea>
+    <button onclick="generateAudio()">🎙️ Speak Now</button>
+
+    <!-- TTS Playback Audio -->
+    <audio id="player" controls></audio>
+
+    <hr>
+
+    <!-- Echo Bot Section -->
+    <h1>🎧 Echo Bot</h1>
+    <button id="startBtn" class="green-btn" onclick="startRecording()">Start Recording</button>
+    <button id="stopBtn" class="red-btn" onclick="stopRecording()" disabled>Stop Recording</button>
+
+    <!-- Recorded Audio Playback -->
+    <audio id="echoAudio" controls></audio>
+
+    <!-- Transcription Text from STT -->
+    <p id="transcription">📝 Transcription will appear here...</p>
+
+    <!-- Status Messages (Uploading, Transcribing, etc.) -->
+    <p id="statusMsg">Idle</p>
+
+    <div class="footer">Day 6 with Murf AI</div>
   </div>
+  <script>
+  let mediaRecorder;
+  let audioChunks = [];
+
+  async function startRecording() {
+    document.getElementById("transcription").innerHTML = "";
+    document.getElementById("statusMsg").innerHTML = "🎙️ Recording...";
+    document.getElementById("startBtn").disabled = true;
+    document.getElementById("stopBtn").disabled = false;
+
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = (e) => {
+      audioChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = async () => {
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      const audioUrl = URL.createObjectURL(blob);
+      document.getElementById("echoAudio").src = audioUrl;
+
+      const formData = new FormData();
+      formData.append("file", blob, "recording.webm");
+
+      try {
+        // ✅ Upload
+        document.getElementById("statusMsg").innerHTML = "⬆️ Uploading to backend...";
+        const res = await fetch("http://127.0.0.1:8000/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+
+        if (data.status === "success") {
+          document.getElementById("statusMsg").innerHTML = `
+            <div style="color:green; font-weight:bold;">
+              ✅ Upload Successful<br>
+              File: <code>${data.name}</code><br>
+              Type: ${data.type}<br>
+              URL: <a href="${data.url}" target="_blank">${data.url}</a>
+            </div>
+          `;
+        } else {
+          document.getElementById("statusMsg").innerHTML = "❌ Upload failed.";
+        }
+
+        // 🧠 Transcribe
+        document.getElementById("statusMsg").innerHTML += "<p>🧠 Transcribing audio...</p>";
+        const transcribeRes = await fetch("http://127.0.0.1:8000/transcribe/file", {
+          method: "POST",
+          body: formData
+        });
+
+        const transcribeData = await transcribeRes.json();
+        if (transcribeData.transcription) {
+          document.getElementById("transcription").innerHTML = `
+            <div style="border:2px solid purple; padding:10px; border-radius:10px; background:#f4eaff;">
+              <strong>Transcript:</strong><br>
+              <span style="font-size:16px;">${transcribeData.transcription}</span>
+            </div>
+          `;
+        } else {
+          document.getElementById("transcription").innerHTML = "❌ No transcription returned.";
+        }
+
+      } catch (err) {
+        document.getElementById("statusMsg").innerHTML = "❌ Upload or transcription failed.";
+      }
+
+      document.getElementById("startBtn").disabled = false;
+      document.getElementById("stopBtn").disabled = true;
+    };
+
+    mediaRecorder.start();
+  }
+
+  function stopRecording() {
+    mediaRecorder.stop();
+  }
+
+  async function generateAudio() {
+    const text = document.getElementById("textInput").value;
+    const res = await fetch("/generate-voice/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text })
+    });
+    const data = await res.json();
+    if (data.audio_url) {
+      document.getElementById("player").src = data.audio_url;
+    }
+  }
+</script>
+
+  
 </body>
 </html>
