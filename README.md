@@ -2,6 +2,14 @@
 
 An evolving AI voice agent built to handle text-to-speech, speech-to-text, and smart voice switching, with more powerful features coming soon.
 
+## Preview
+
+![Screenshot 1](public/ss1.png)
+
+![Screenshot 2](public/ss2.png)
+
+![Screenshot 3](public/ss3.png)
+
 ## Features
 
 - **Text-to-Speech (TTS)**: Convert text into natural-sounding speech using Google Text-to-Speech (gTTS)
