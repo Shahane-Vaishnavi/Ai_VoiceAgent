@@ -33,7 +33,7 @@ async def get_home():
 # Serve favicon
 @app.get("/favicon.ico")
 async def favicon():
-    return FileResponse("static/favicon.ico")
+    return FileResponse("static/favicon.ico", media_type="image/jpeg")
 
 # Text-to-Speech via API (for JS/AJAX)
 @app.post("/generate-voice/")
