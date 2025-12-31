@@ -1,0 +1,143 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #3b0a20, #1a000d);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  overflow: auto;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 40px;
+  width: 90%;
+  max-width: 560px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 40px rgba(245, 246, 246, 0.241);
+  text-align: center;
+  animation: slideIn 1s ease-out;
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+h1 {
+  font-size: 2.3rem;
+  margin-bottom: 20px;
+  background: linear-gradient(to right, #ff4e8e, #ffb199);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+textarea {
+  width: 100%;
+  height: 120px;
+  padding: 15px;
+  font-size: 1rem;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  resize: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 14px 32px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(to right, #ff416c, #ff4b2b);
+  color: #1a1a1a;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 12px rgba(255, 80, 120, 0.5);
+  margin: 10px;
+}
+
+button:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 20px rgba(255, 80, 120, 0.7);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.green-btn {
+  background: linear-gradient(to right, #28a745, #218838);
+  color: white;
+}
+
+.red-btn {
+  background: linear-gradient(to right, #dc3545, #c82333);
+  color: white;
+}
+
+#transcription {
+  margin-top: 15px;
+  border: 2px solid purple;
+  padding: 10px;
+  border-radius: 10px;
+  background: #f4eaff;
+  color: black;
+}
+
+audio {
+  margin-top: 30px;
+  width: 100%;
+  border-radius: 12px;
+}
+
+input[type="text"] {
+  width: 80%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  margin-bottom: 10px;
+}
+
+.footer {
+  margin-top: 25px;
+  font-size: 0.8rem;
+  color: #ccc;
+  font-style: italic;
+}
+
+.status {
+  margin-top: 20px;
+  font-size: 0.95rem;
+  color: #aaffaa;
+}
+
+@media (max-width: 500px) {
+  h1 {
+    font-size: 1.6rem;
+  }
+  button {
+    width: 100%;
+  }
+}
+
